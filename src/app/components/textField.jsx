@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-const TextField = ({ label, type, value, name, onChange }) => {
+const TextField = ({ label, type, value, name, onChange, error }) => {
     return (
         <div>
             <label htmlFor={name}>{label}</label>
@@ -11,6 +11,7 @@ const TextField = ({ label, type, value, name, onChange }) => {
                 name={name}
                 onChange={onChange}
             />
+            {!!error && <p>{error}</p>}
         </div>
     );
 };
@@ -22,6 +23,7 @@ TextField.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    error: PropTypes.string
 };
 export default TextField;

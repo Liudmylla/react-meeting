@@ -1,22 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "../components/textField";
+import { validator } from "../utils/validator";
 
 const Login = () => {
     const [data, setData] = useState({ email: "", password: "" });
+    const [errors, setErrors] = useState({});
     const handleChange = ({ target }) => {
         setData((prevState) => ({
             ...prevState,
             [target.name]: target.value
         }));
     };
+    const validatorConfig = {
+        email: { isRequired: { message: "Email is required" } },
+        password: { isRequired: { message: "Password is required" } }
+    };
+    useEffect(() => {
+        validate();
+    }, [data]);
+
+    const validate = () => {
+        const errors = validator(data, validatorConfig);
+        // for (const fieldName in data) {
+        //     if (data[fieldName].trim() === "") {
+        //         errors[fieldName] = `${fieldName} is required`;
+        //     }
+        // }
+        setErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const isValide = validate();
+        if (!isValide) return;
+        console.log(data);
+    };
 
     return (
-        <form action="">
+        <form onSubmit={handleSubmit}>
             <TextField
                 label="Email"
                 name="email"
                 value={data.email}
                 onChange={handleChange}
+                error={errors.email}
             />
             <TextField
                 label="password"
@@ -24,7 +51,9 @@ const Login = () => {
                 name="password"
                 value={data.password}
                 onChange={handleChange}
+                error={errors.password}
             />
+            <button type="submit">Submit</button>
         </form>
     );
 };
