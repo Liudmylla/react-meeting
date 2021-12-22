@@ -6,12 +6,14 @@ import api from "../api";
 import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import UserTable from "./usersTable";
+import SearchPanel from "./searchPanel";
 import _ from "lodash";
 const UsersList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
+    const [searchQuery, setSearchQuery] = useState("");
     const pageSize = 8;
 
     const [users, setUsers] = useState();
@@ -40,6 +42,7 @@ const UsersList = () => {
     }, [selectedProf]);
 
     const handleProfessionSelect = (item) => {
+        setSearchQuery("");
         setSelectedProf(item);
     };
 
@@ -49,9 +52,17 @@ const UsersList = () => {
     const handleSort = (item) => {
         setSortBy(item);
     };
+    const handleSearchQuery = ({ target }) => {
+        setSelectedProf();
+        setSearchQuery(target.value);
+    };
 
     if (users) {
-        const filteredUsers = selectedProf
+        const filteredUsers = searchQuery
+            ? users.filter((user) =>
+                  user.name.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+            : selectedProf
             ? users.filter(
                   (user) =>
                       JSON.stringify(user.profession) ===
@@ -68,6 +79,7 @@ const UsersList = () => {
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
         const clearFilter = () => {
             setSelectedProf();
+            setSearchQuery("");
         };
 
         return (
@@ -84,12 +96,16 @@ const UsersList = () => {
                             onClick={clearFilter}
                         >
                             {" "}
-                            Очиститть
+                            Show all
                         </button>
                     </div>
                 )}
                 <div className="d-flex flex-column">
                     <SearchStatus length={count} />
+                    <SearchPanel
+                        value={searchQuery}
+                        onChange={handleSearchQuery}
+                    />
                     {count > 0 && (
                         <UserTable
                             users={usersCrop}
